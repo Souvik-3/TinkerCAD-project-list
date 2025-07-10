@@ -1,0 +1,51 @@
+int analogPin = A0;
+int chargePin = 7;
+int dischargePin = 8;
+unsigned long startTime;
+unsigned long elapsedTime;
+float microFarads;                
+float nanoFarads;
+
+void setup()
+{
+  pinMode(chargePin, OUTPUT);      
+  digitalWrite(chargePin, LOW);   
+  pinMode(dischargePin, OUTPUT);   
+  Serial.begin(9600);             
+}
+
+void loop()
+{
+  digitalWrite(chargePin, LOW);   
+  digitalWrite(dischargePin, LOW); 
+  pinMode(analogPin, OUTPUT);     
+  digitalWrite(analogPin, LOW);   
+  delay(1000);
+
+  pinMode(analogPin, INPUT);      
+  digitalWrite(dischargePin, LOW); 
+  digitalWrite(chargePin, HIGH);  
+
+  startTime = micros();
+  while(analogRead(analogPin) < 648) { }
+  elapsedTime = micros() - startTime;
+
+  microFarads = ((float)elapsedTime / 10000) * 0.693;  
+
+  if (microFarads > 1)
+  {
+    Serial.print((long)microFarads);       
+    Serial.println(" microFarads");
+  }
+  else
+  {
+    nanoFarads = microFarads * 1000.0;     
+    Serial.print((long)nanoFarads);        
+    Serial.println(" nanoFarads");
+  }
+
+  digitalWrite(chargePin, LOW);            
+  pinMode(dischargePin, OUTPUT);           
+  digitalWrite(dischargePin, LOW);         
+  delay(1000);
+}
